@@ -1,5 +1,13 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Button, StyleSheet } from 'react-native';
+import { View, Text, TextInput, TouchableHighlight, StyleSheet, FlatList } from 'react-native';
+
+const tipPercentages = [
+  { id: '10', label: '10%' },
+  { id: '15', label: '15%' },
+  { id: '20', label: '20%' },
+  { id: '25', label: '25%' },
+  { id: '', label: 'Custom' },
+];
 
 export default function App() {
   const [billAmount, setBillAmount] = useState('');
@@ -15,9 +23,25 @@ export default function App() {
     setTotalAmount(total.toFixed(2));
   }
 
+  const generateRandomBillAmount = () => {
+    const randomAmount = (Math.floor(Math.random() * 401) + 100).toFixed(2);
+    setBillAmount(randomAmount);
+  }
+
+  const renderTipButton = ({ item }) => (
+    <TouchableHighlight style={[styles.button, {backgroundColor: '#8B5FBF'}]} onPress={() => setTipPercentage(item.id)}>
+      <Text style={styles.buttonText}>{item.label}</Text>
+    </TouchableHighlight>
+  );
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Tip Calculator</Text>
+      <View style={styles.buttonContainer}>
+        <TouchableHighlight style={styles.button} onPress={generateRandomBillAmount}>
+          <Text style={styles.buttonText}>Generate Random Bill Amount</Text>
+        </TouchableHighlight>
+      </View>
       <View style={styles.inputContainer}>
         <Text style={styles.label}>Bill Amount:</Text>
         <TextInput
@@ -38,14 +62,17 @@ export default function App() {
           onChangeText={value => setTipPercentage(value)}
         />
       </View>
-      <View style={styles.buttonContainer}>
-        <Button title="10%" onPress={() => setTipPercentage('10')} />
-        <Button title="15%" onPress={() => setTipPercentage('15')} />
-        <Button title="20%" onPress={() => setTipPercentage('20')} />
-        <Button title="Custom" onPress={() => setTipPercentage('')} />
-      </View>
+      <FlatList
+        data={tipPercentages}
+        keyExtractor={item => item.id}
+        renderItem={renderTipButton}
+        horizontal={true}
+        contentContainerStyle={styles.buttonContainer}
+      />
       <View style={styles.calculateButtonContainer}>
-        <Button title="Calculate Tip" onPress={calculateTip} />
+        <TouchableHighlight style={[styles.calculateButton, {backgroundColor: '#8B5FBF'}]} onPress={calculateTip}>
+          <Text style={styles.buttonText}>Calculate Tip</Text>
+        </TouchableHighlight>
       </View>
       {tipAmount !== '' && totalAmount !== '' && (
         <View style={styles.resultContainer}>
@@ -62,13 +89,32 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#fff',
     alignItems: 'center',
-    justifyContent: 'flex-start',
-    paddingTop: 50,
+    justifyContent: 'center',
+    paddingHorizontal: 20,
   },
   title: {
-    fontSize: 24,
+    fontSize: 30,
     fontWeight: 'bold',
+    color: '#8B5FBF',
     marginBottom: 20,
+  },
+  buttonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  button: {
+    backgroundColor: '#8B5FBF',
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+    borderRadius: 5,
+    marginRight: 10,
+  },
+  buttonText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: 'bold',
   },
   inputContainer: {
     flexDirection: 'row',
@@ -76,30 +122,39 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   label: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#8B5FBF',
     marginRight: 10,
-    fontSize: 16,
   },
   input: {
-    borderWidth: 1,
-    borderColor: '#ccc',
-    padding: 8,
-    borderRadius: 8,
     flex: 1,
-  },
-  buttonContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 20,
+    height: 40,
+    borderColor: '#8B5FBF',
+    borderWidth: 1,
+    borderRadius: 5,
+    paddingHorizontal: 10,
   },
   calculateButtonContainer: {
-    width: '100%',
-    marginBottom: 20,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 20,
+    marginBottom: 40,
+  },
+  calculateButton: {
+    backgroundColor: '#8B5FBF',
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+    borderRadius: 5,
   },
   resultContainer: {
-    alignItems: 'center',
+    marginTop: 20,
   },
   resultText: {
     fontSize: 18,
+    color: '#8B5FBF',
     marginBottom: 10,
+    paddingBottom: 10,
   },
 });
